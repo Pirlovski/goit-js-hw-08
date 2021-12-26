@@ -1,4 +1,4 @@
-// import throttle from 'lodash.throttle' ;
+import throttle from 'lodash.throttle' ;
 
 const refs = {
   form: document.querySelector('.feedback-form'),
@@ -26,7 +26,7 @@ const dataToSaved = {
 localStorage.setItem('feedback-form-state' , JSON.stringify(dataToSaved)) ;
 };
 
-refs.form.addEventListener('input',onFormInput);
+refs.form.addEventListener('input',throttle (onFormInput , 500));
 
 // получение из локального хранилища при перезагрузке страницы
 const onPopulateForm = () => {
