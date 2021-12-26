@@ -28,21 +28,31 @@ localStorage.setItem('feedback-form-state' , JSON.stringify(dataToSaved)) ;
 
 refs.form.addEventListener('input',onFormInput);
 
-
+// получение из локального хранилища при перезагрузке страницы
 const onPopulateForm = () => {
-  if (localStorage.getItem(FORM_KEY)) {
-      Object.entries(JSON.parse(localStorage.getItem(FORM_KEY))).forEach(([name, value]) => feedbackForm.elements[name].value = value); // `${name}: ${value}`; `${name}: value`; `${name} = value`
-  }
+const savedMessage = localStorage.getItem(FORM_KEY) ;
+
+
+  if (savedMessage ) {
+      Object.entries(JSON.parse(savedMessage )).forEach(([name, value]) => refs.form.elements[name].value = value); // `${name}: ${value}`; `${name}: value`; `${name} = value`
+    }
 };
 onPopulateForm();
-
-const onFormSubmit = event => {
-  event.preventDefault();
-  if (feedbackForm.elements.email.value && feedbackForm.elements.message.value !== "") {
-      console.log('Отправляем форму с данными: ', JSON.parse(localStorage.getItem(FORM_KEY)));
-      event.currentTarget.reset();
-      localStorage.removeItem(FORM_KEY);
-  };
+/*
+Сабмит формы:
+- Останавливаем поведение по умолчанию
+- Очищаем интерфейс(форму от значений)
+- Убираем отправленные данные из локального хранилища
+*/
+const onFormSubmit = evt => {
+evt.preventDefault();
+const emailValue = messageEL.email.value ;
+const textereaValue = messageEL.message.value ;
+if(emailValue && textereaValue !== ""){
+  console.log('Отправляем форму с данными: ' , savedMessage ) ;
+  evt.currentTarget.reset() ; 
+  localStorage.removeItem( FORM_KEY) ; 
+};
 };
 
-feedbackForm.addEventListener("submit", onFormSubmit);
+messageEL.addEventListener('submit' , onFormSubmit) ;
