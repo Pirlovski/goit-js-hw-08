@@ -1,42 +1,31 @@
-import throttle from 'lodash.throttle' ;
+import throttle from 'lodash.throttle';
 
-const refs = {
-  form: document.querySelector('.feedback-form'),
-  input: document.querySelector('.feedback-form input') ,
-  textarea: document.querySelector('.feedback-form textarea') ,
+const feedbackForm = document.querySelector('.feedback-form');
 
-  
-};
-const FORM_KEY = "feedback-form-state";
+const FORM_KEY = 'feedback-form-state';
 
+const onFormInput = () => {
+  //   const messageEL = evt.target.elements;
 
-const onFormInput = evt => {
-  const messageEL = evt.currentTarget.elements;
-// console.dir(onFormInput) ;
-
-const mail = messageEL.email.value ; 
-const message = messageEL.message.value ;
-
-const dataToSaved = {
-
-  mail,
-  message,
-}
-
-localStorage.setItem('feedback-form-state' , JSON.stringify(dataToSaved)) ;
+  // const mail = evt.target.elements.elements.email.value ;
+  // const message = evt.target.elements.elements.message.value ;
+  const formData = new FormData(feedbackForm);
+  let userForm = {};
+  formData.forEach((value, name) => (userForm[name] = value.trim()));
+  localStorage.setItem(FORM_KEY, JSON.stringify(userForm));
 };
 
-refs.form.addEventListener('input',throttle (onFormInput , 500));
+feedbackForm.addEventListener('input', throttle(onFormInput, 500));
 
 // получение из локального хранилища при перезагрузке страницы
 const onPopulateForm = () => {
-const savedMessage = localStorage.getItem(FORM_KEY) ;
-
-
-  if (savedMessage ) {
-      Object.entries(JSON.parse(savedMessage )).forEach(([name, value]) => refs.form.elements[name].value = value); // `${name}: ${value}`; `${name}: value`; `${name} = value`
-    }
+  if (localStorage.getItem(FORM_KEY)) {
+    Object.entries(JSON.parse(localStorage.getItem(FORM_KEY))).forEach(
+      ([name, value]) => (feedbackForm.elements[name].value = value),
+    ); // `${name}: ${value}`; `${name}: value`; `${name} = value`
+  }
 };
+
 onPopulateForm();
 /*
 Сабмит формы:
@@ -45,14 +34,14 @@ onPopulateForm();
 - Убираем отправленные данные из локального хранилища
 */
 const onFormSubmit = evt => {
-evt.preventDefault();
-const emailValue = messageEL.email.value ;
-const textereaValue = messageEL.message.value ;
-if(emailValue && textereaValue !== ""){
-  console.log('Отправляем форму с данными: ' , savedMessage ) ;
-  evt.currentTarget.reset() ; 
-  localStorage.removeItem( FORM_KEY) ; 
-};
+  evt.preventDefault();
+  // const emailValue = messageEL.email.value ;
+  // const textereaValue = messageEL.message.value ;
+  if (feedbackForm.elements.email.value && feedbackForm.elements.message.value !== '') {
+    console.log('Отправляем форму с данными: ', JSON.parse(localStorage.getItem(FORM_KEY)));
+    evt.currentTarget.reset();
+    localStorage.removeItem(FORM_KEY);
+  }
 };
 
-messageEL.addEventListener('submit' , onFormSubmit) ;
+feedbackForm.addEventListener('submit', onFormSubmit);
